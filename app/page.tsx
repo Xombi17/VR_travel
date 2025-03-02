@@ -209,8 +209,7 @@ export default function Home() {
             whileInView="show"
             viewport={{ once: false, amount: 0.2 }}
           >
-            {destinations
-              .filter(d => d.featured)
+            {featuredDestinations
               .map((destination, index) => (
                 <motion.div
                   key={destination.id}

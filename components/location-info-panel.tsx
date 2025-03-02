@@ -4,6 +4,7 @@ import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { ChevronRight, Clock, Cloud, MapPin, Calendar, Info, X } from "lucide-react"
+import Image from "next/image"
 
 interface LocationInfo {
   title: string
@@ -122,20 +123,19 @@ export function LocationInfoPanel({ info, isOpen, onClose }: LocationInfoPanelPr
             ) : (
               <div className="space-y-4">
                 {info.nearbyPlaces.map((place, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center gap-4 bg-white/5 rounded-lg p-3 hover:bg-white/10 transition-colors cursor-pointer"
-                  >
+                  <div key={index} className="flex items-center gap-4 mb-4 last:mb-0">
                     {place.image && (
-                      <img
+                      <Image
                         src={place.image}
                         alt={place.name}
-                        className="w-16 h-16 rounded-md object-cover"
+                        width={80}
+                        height={60}
+                        className="rounded-lg object-cover"
                       />
                     )}
                     <div>
-                      <h4 className="font-medium">{place.name}</h4>
-                      <p className="text-sm text-gray-300">{place.distance} away</p>
+                      <h4 className="font-medium text-white">{place.name}</h4>
+                      <p className="text-sm text-white/60">{place.distance}</p>
                     </div>
                   </div>
                 ))}

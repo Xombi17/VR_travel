@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 
 interface PanoramaPreloaderProps {
   urls: string[]
@@ -13,23 +13,19 @@ export function PanoramaPreloader({
   onProgress,
   onComplete
 }: PanoramaPreloaderProps) {
-  const [loadedCount, setLoadedCount] = useState(0)
-
   useEffect(() => {
+    let loadedImages = 0
     const images = urls.map(url => {
       const img = new Image()
       img.src = url
       return new Promise<void>((resolve, reject) => {
         img.onload = () => {
-          setLoadedCount(prev => {
-            const newCount = prev + 1
-            const progress = (newCount / urls.length) * 100
-            onProgress?.(progress)
-            if (newCount === urls.length) {
-              onComplete?.()
-            }
-            return newCount
-          })
+          loadedImages++
+          const progress = (loadedImages / urls.length) * 100
+          onProgress?.(progress)
+          if (loadedImages === urls.length) {
+            onComplete?.()
+          }
           resolve()
         }
         img.onerror = reject

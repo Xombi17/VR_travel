@@ -3,21 +3,15 @@
 import { useEffect, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { 
-  Loader2, 
   Volume2, 
   VolumeX, 
   Maximize2, 
   Minimize2, 
-  MapPin, 
-  ZoomIn, 
-  ZoomOut, 
   RotateCcw, 
-  Compass, 
   Glasses, 
   Info 
 } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Viewer } from '@photo-sphere-viewer/core'
 import { MarkersPlugin } from '@photo-sphere-viewer/markers-plugin'
 import type { Marker } from '@photo-sphere-viewer/markers-plugin'
@@ -25,7 +19,6 @@ import '@photo-sphere-viewer/core/index.css'
 import '@photo-sphere-viewer/markers-plugin/index.css'
 import { LocationInfoPanel } from "@/components/location-info-panel"
 import { PanoramaMiniMap } from "@/components/panorama-minimap"
-import { AmbientAudioSystem } from "@/components/ambient-audio-system"
 import { AROverlay } from "@/components/ar-overlay"
 import { SocialFeatures } from "@/components/social-features"
 import { TimeSelector } from "@/components/time-selector"

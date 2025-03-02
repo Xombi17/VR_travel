@@ -53,7 +53,7 @@ const panoramas = [
     hotspots: [
       {
         pitch: -2.1,
-        yaw: 28.1,
+        yaw: 44.3,
         text: "Eiffel Tower",
         description: "The iconic symbol of Paris, standing 324 meters tall. Built in 1889, it attracts over 7 million visitors annually.",
         image: "/images/destinations/eiffel-tower.jpg",
@@ -135,28 +135,28 @@ const panoramas = [
         name: "Sunrise",
         time: "06:00",
         icon: "sunrise",
-        imageUrl: "/images/panoramas/paris.jpg"
+        imageUrl: "/images/panoramas/paris-panorama.jpg"
       },
       {
         id: "day",
         name: "Day",
         time: "12:00",
         icon: "noon",
-        imageUrl: "/images/panoramas/paris.jpg"
+        imageUrl: "/images/panoramas/paris-panorama.jpg"
       },
       {
         id: "sunset",
         name: "Sunset",
         time: "18:00",
         icon: "sunset",
-        imageUrl: "/images/panoramas/paris.jpg"
+        imageUrl: "/images/panoramas/paris-panorama.jpg"
       },
       {
         id: "night",
         name: "Night",
         time: "21:00",
         icon: "night",
-        imageUrl: "/images/panoramas/paris.jpg"
+        imageUrl: "/images/panoramas/paris-panorama.jpg"
       }
     ]
   },
@@ -277,6 +277,14 @@ const panoramas = [
         type: "time",
         title: "Best Sunset Spot",
         content: "Oia is famous for its sunsets. The best viewing time is between 19:00 and 20:00 during summer months."
+      },
+      {
+        id: "aegean-sea-info",
+        yaw: 12.9,
+        pitch: -5.3,
+        type: "info",
+        title: "Aegean Sea",
+        content: "The beautiful Aegean Sea surrounds Santorini, offering stunning views and perfect sailing conditions."
       }
     ],
     timeViews: [
@@ -285,28 +293,28 @@ const panoramas = [
         name: "Morning",
         time: "08:00",
         icon: "morning",
-        imageUrl: "/images/panoramas/santorini.jpg"
+        imageUrl: "/images/panoramas/santorini-panorama.jpg"
       },
       {
         id: "afternoon",
         name: "Afternoon",
         time: "14:00",
         icon: "afternoon",
-        imageUrl: "/images/panoramas/santorini.jpg"
+        imageUrl: "/images/panoramas/santorini-panorama.jpg"
       },
       {
         id: "sunset",
         name: "Sunset",
         time: "19:00",
         icon: "sunset",
-        imageUrl: "/images/panoramas/santorini.jpg"
+        imageUrl: "/images/panoramas/santorini-panorama.jpg"
       },
       {
         id: "night",
         name: "Night",
         time: "22:00",
         icon: "night",
-        imageUrl: "/images/panoramas/santorini.jpg"
+        imageUrl: "/images/panoramas/santorini-panorama.jpg"
       }
     ]
   },
@@ -434,28 +442,28 @@ const panoramas = [
         name: "Sunrise",
         time: "06:00",
         icon: "sunrise",
-        imageUrl: "/images/panoramas/grand-canyon.jpg"
+        imageUrl: "/images/panoramas/grand-canyon-panorama.jpg"
       },
       {
         id: "day",
         name: "Day",
         time: "12:00",
         icon: "noon",
-        imageUrl: "/images/panoramas/grand-canyon.jpg"
+        imageUrl: "/images/panoramas/grand-canyon-panorama.jpg"
       },
       {
         id: "sunset",
         name: "Sunset",
         time: "18:00",
         icon: "sunset",
-        imageUrl: "/images/panoramas/grand-canyon.jpg"
+        imageUrl: "/images/panoramas/grand-canyon-panorama.jpg"
       },
       {
         id: "night",
         name: "Night",
         time: "21:00",
         icon: "night",
-        imageUrl: "/images/panoramas/grand-canyon.jpg"
+        imageUrl: "/images/panoramas/grand-canyon-panorama.jpg"
       }
     ]
   },
@@ -583,28 +591,28 @@ const panoramas = [
         name: "Morning",
         time: "08:00",
         icon: "morning",
-        imageUrl: "/images/panoramas/kyoto.jpg"
+        imageUrl: "/images/panoramas/kyoto-panorama.jpg"
       },
       {
         id: "afternoon",
         name: "Afternoon",
         time: "14:00",
         icon: "afternoon",
-        imageUrl: "/images/panoramas/kyoto.jpg"
+        imageUrl: "/images/panoramas/kyoto-panorama.jpg"
       },
       {
         id: "sunset",
         name: "Sunset",
         time: "18:00",
         icon: "sunset",
-        imageUrl: "/images/panoramas/kyoto.jpg"
+        imageUrl: "/images/panoramas/kyoto-panorama.jpg"
       },
       {
         id: "night",
         name: "Night",
         time: "21:00",
         icon: "night",
-        imageUrl: "/images/panoramas/kyoto.jpg"
+        imageUrl: "/images/panoramas/kyoto-panorama.jpg"
       }
     ]
   },
@@ -732,28 +740,28 @@ const panoramas = [
         name: "Sunrise",
         time: "06:00",
         icon: "sunrise",
-        imageUrl: "/images/panoramas/taj-mahal.jpg"
+        imageUrl: "/images/panoramas/taj-mahal-panorama.jpg"
       },
       {
         id: "day",
         name: "Day",
         time: "12:00",
         icon: "noon",
-        imageUrl: "/images/panoramas/taj-mahal.jpg"
+        imageUrl: "/images/panoramas/taj-mahal-panorama.jpg"
       },
       {
         id: "sunset",
         name: "Sunset",
         time: "18:00",
         icon: "sunset",
-        imageUrl: "/images/panoramas/taj-mahal.jpg"
+        imageUrl: "/images/panoramas/taj-mahal-panorama.jpg"
       },
       {
         id: "night",
         name: "Night",
         time: "21:00",
         icon: "night",
-        imageUrl: "/images/panoramas/taj-mahal.jpg"
+        imageUrl: "/images/panoramas/taj-mahal-panorama.jpg"
       }
     ]
   }

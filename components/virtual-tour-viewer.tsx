@@ -2,17 +2,35 @@
 
 import { useEffect, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Loader2, Maximize2, Minimize2, VolumeX, Volume2, Compass, Glasses, RotateCcw, ZoomIn, ZoomOut, Info, MapPin } from "lucide-react"
+import { 
+  Loader2, 
+  Volume2, 
+  VolumeX, 
+  Maximize2, 
+  Minimize2, 
+  MapPin, 
+  ZoomIn, 
+  ZoomOut, 
+  RotateCcw, 
+  Compass, 
+  Glasses, 
+  Info 
+} from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { Viewer } from '@photo-sphere-viewer/core'
+import { MarkersPlugin } from '@photo-sphere-viewer/markers-plugin'
+import type { Marker } from '@photo-sphere-viewer/markers-plugin'
 import '@photo-sphere-viewer/core/index.css'
+import '@photo-sphere-viewer/markers-plugin/index.css'
 import { LocationInfoPanel } from "@/components/location-info-panel"
 import { PanoramaMiniMap } from "@/components/panorama-minimap"
 import { AmbientAudioSystem } from "@/components/ambient-audio-system"
 import { AROverlay } from "@/components/ar-overlay"
 import { SocialFeatures } from "@/components/social-features"
 import { TimeSelector } from "@/components/time-selector"
+import { LoadingOverlay } from "@/components/loading-overlay"
+import { PanoramaPreloader } from "@/components/panorama-preloader"
 import { cn } from "@/lib/utils"
 
 interface VirtualTourViewerProps {
@@ -75,6 +93,20 @@ interface VirtualTourViewerProps {
   className?: string
 }
 
+interface MarkerData extends Marker {
+  id: string;
+  longitude: number;
+  latitude: number;
+  html: string;
+  anchor: string;
+  scale: [number, number];
+  className: string;
+  style: {
+    cursor: string;
+    zIndex: number;
+  };
+}
+
 export function VirtualTourViewer({
   panoramaId,
   panoramaUrl,
@@ -92,6 +124,7 @@ export function VirtualTourViewer({
   const audioRef = useRef<HTMLAudioElement>(null)
   const panoViewerRef = useRef<Viewer | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [loadingProgress, setLoadingProgress] = useState(0)
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [isMuted, setIsMuted] = useState(true)
   const [showControls, setShowControls] = useState(true)
@@ -101,10 +134,22 @@ export function VirtualTourViewer({
   const [currentYaw, setCurrentYaw] = useState(0)
   const [currentPitch, setCurrentPitch] = useState(0)
 
+  // Preload all panorama images
+  useEffect(() => {
+    const imagesToPreload = [
+      panoramaUrl,
+      ...timeViews.map(view => view.imageUrl)
+    ]
+    setLoadingProgress(0)
+  }, [panoramaUrl, timeViews])
+
   // Initialize panorama viewer
   useEffect(() => {
     if (!viewerRef.current || panoViewerRef.current) return
 
+    console.log('Initializing viewer with hotspots:', hotspots)
+
+    // Create the viewer with smooth movement
     const viewer = new Viewer({
       container: viewerRef.current,
       panorama: panoramaUrl,
@@ -116,10 +161,20 @@ export function VirtualTourViewer({
       mousemove: true,
       moveSpeed: 1.5,
       zoomSpeed: 1,
+      transition: {
+        duration: 1500,
+        loader: true,
+        blur: true,
+      },
       navbar: false,
       defaultLat: 0,
       defaultLong: 0,
       fisheye: true,
+      loadingImg: 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7',
+      loadingTxt: 'Loading...',
+      plugins: [[MarkersPlugin, {
+        markers: [] // Initialize with empty markers array
+      }]],
       sphereCorrection: {
         pan: 0,
         tilt: 0,
@@ -132,230 +187,269 @@ export function VirtualTourViewer({
         croppedHeight: 4096,
         croppedX: 0,
         croppedY: 0
-      },
-      markers: hotspots.map(hotspot => ({
-        id: hotspot.text,
-        longitude: hotspot.yaw * Math.PI / 180,
-        latitude: hotspot.pitch * Math.PI / 180,
-        html: `
-          <div class="group relative">
-            <div class="w-6 h-6 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center cursor-pointer hover:bg-white/40 transition-all duration-300 hover:scale-110 hover:shadow-[0_0_15px_rgba(255,255,255,0.5)]">
-              <div class="w-2 h-2 bg-white rounded-full animate-ping absolute"></div>
-              <div class="w-2 h-2 bg-white rounded-full"></div>
-            </div>
-            <div class="absolute top-full left-1/2 -translate-x-1/2 mt-2 opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none transform group-hover:translate-y-0 translate-y-2">
-              <div class="bg-black/80 backdrop-blur-md px-4 py-2 rounded-lg shadow-lg">
-                <div class="text-sm font-medium text-white whitespace-nowrap">${hotspot.text}</div>
-                ${hotspot.description ? `
-                  <div class="text-xs text-gray-300 mt-1 max-w-[200px]">${hotspot.description}</div>
-                ` : ''}
-                ${hotspot.image ? `
-                  <div class="mt-2 rounded-md overflow-hidden">
-                    <img src="${hotspot.image}" alt="${hotspot.text}" class="w-full h-24 object-cover" />
-                  </div>
-                ` : ''}
-                ${hotspot.url ? `
-                  <button class="mt-2 text-xs bg-white/10 hover:bg-white/20 text-white px-3 py-1 rounded-full transition-colors">
-                    Learn More
-                  </button>
-                ` : ''}
-              </div>
-            </div>
-          </div>
-        `,
-        anchor: 'center center',
-        scale: [1, 1],
-        className: 'hotspot-marker',
-        style: {
-          cursor: hotspot.url ? 'pointer' : 'default',
-          zIndex: 10,
-        }
-      }))
-    })
-
-    viewer.addEventListener('ready', () => {
-      setIsLoading(false)
-    })
-
-    viewer.addEventListener('click-marker', ({ marker }) => {
-      const hotspot = hotspots.find(h => h.text === marker.id)
-      if (hotspot?.url) {
-        window.open(hotspot.url, '_blank')
       }
     })
 
+    // Store viewer reference
     panoViewerRef.current = viewer
 
+    // Initialize markers after viewer is ready
+    viewer.addEventListener('ready', () => {
+      console.log('Viewer ready, initializing markers')
+      
+      const markersPlugin = viewer.getPlugin(MarkersPlugin)
+      if (!markersPlugin) {
+        console.error('Markers plugin not initialized')
+        return
+      }
+
+      // Clear any existing markers
+      markersPlugin.clearMarkers()
+      
+      // Add markers one by one with delay to ensure proper initialization
+      hotspots.forEach((hotspot, index) => {
+        setTimeout(() => {
+          try {
+            // Convert degrees to radians
+            const longitude = hotspot.yaw * Math.PI / 180
+            const latitude = hotspot.pitch * Math.PI / 180
+            
+            console.log(`Adding marker for ${hotspot.text}:`, {
+              original: { yaw: hotspot.yaw, pitch: hotspot.pitch },
+              converted: { longitude, latitude }
+            })
+
+            const markerData: MarkerData = {
+              id: hotspot.text,
+              longitude,
+              latitude,
+              html: `
+                <div class="group relative">
+                  <div class="w-6 h-6 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center cursor-pointer hover:bg-white/40 transition-all duration-300 hover:scale-110 hover:shadow-[0_0_15px_rgba(255,255,255,0.5)]">
+                    <div class="w-2 h-2 bg-white rounded-full animate-ping absolute"></div>
+                    <div class="w-2 h-2 bg-white rounded-full"></div>
+                  </div>
+                  <div class="absolute top-full left-1/2 -translate-x-1/2 mt-2 opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none transform group-hover:translate-y-0 translate-y-2">
+                    <div class="bg-black/80 backdrop-blur-md px-4 py-2 rounded-lg shadow-lg">
+                      <div class="text-sm font-medium text-white whitespace-nowrap">${hotspot.text}</div>
+                      ${hotspot.description ? `
+                        <div class="text-xs text-gray-300 mt-1 max-w-[200px]">${hotspot.description}</div>
+                      ` : ''}
+                      ${hotspot.image ? `
+                        <div class="mt-2 rounded-md overflow-hidden">
+                          <img src="${hotspot.image}" alt="${hotspot.text}" class="w-full h-24 object-cover" />
+                        </div>
+                      ` : ''}
+                      ${hotspot.url ? `
+                        <button class="mt-2 text-xs bg-white/10 hover:bg-white/20 text-white px-3 py-1 rounded-full transition-colors">
+                          Learn More
+                        </button>
+                      ` : ''}
+                    </div>
+                  </div>
+                </div>
+              `,
+              anchor: 'center center',
+              scale: [1, 1],
+              className: 'hotspot-marker',
+              style: {
+                cursor: hotspot.url ? 'pointer' : 'default',
+                zIndex: 10,
+              }
+            }
+
+            markersPlugin.addMarker(markerData)
+          } catch (error) {
+            console.error(`Error adding marker for ${hotspot.text}:`, error)
+          }
+        }, index * 100) // Add 100ms delay between each marker
+      })
+
+      // Add click handler for markers
+      markersPlugin.addEventListener('select-marker', (event: any) => {
+        const marker = event.marker
+        console.log('Marker clicked:', marker)
+        const hotspot = hotspots.find(h => h.text === marker.id)
+        if (hotspot?.url) {
+          window.open(hotspot.url, '_blank')
+        }
+      })
+    })
+
+    viewer.addEventListener('position-updated', (e: any) => {
+      setCurrentYaw(e.longitude * 180 / Math.PI)
+      setCurrentPitch(e.latitude * 180 / Math.PI)
+    })
+
+    // Cleanup
     return () => {
-      viewer.destroy()
-      panoViewerRef.current = null
+      console.log('Cleaning up viewer')
+      if (panoViewerRef.current) {
+        panoViewerRef.current.destroy()
+        panoViewerRef.current = null
+      }
     }
   }, [panoramaUrl, hotspots])
 
-  // Update position tracking
-  useEffect(() => {
+  // Handle viewpoint navigation
+  const goToViewpoint = (viewpoint: typeof viewpoints[0]) => {
     if (!panoViewerRef.current) return
 
-    const updatePosition = () => {
-      const position = panoViewerRef.current?.getPosition()
-      if (position) {
-        setCurrentYaw(position.yaw)
-        setCurrentPitch(position.pitch)
-      }
-    }
-
-    const interval = setInterval(updatePosition, 100)
-    return () => clearInterval(interval)
-  }, [panoViewerRef.current])
-
-  // Handle viewpoint selection
-  const handleViewpointSelect = (yaw: number, pitch: number) => {
-    panoViewerRef.current?.animate({
-      yaw: yaw,
-      pitch: pitch,
-      speed: '10rpm'
+    panoViewerRef.current.animate({
+      longitude: viewpoint.yaw * Math.PI / 180,
+      latitude: viewpoint.pitch * Math.PI / 180,
+      zoom: 50,
+      speed: '2rpm',
     })
   }
 
-  // Handle time view changes
-  const handleTimeViewChange = (viewId: string) => {
-    const view = timeViews.find(v => v.id === viewId)
-    if (view) {
-      setCurrentTimeView(viewId)
-      // Update panorama image
-      panoViewerRef.current?.setPanorama(view.imageUrl)
-    }
-  }
-
-  // Handle fullscreen toggle
-  const toggleFullscreen = () => {
-    if (!viewerRef.current) return
-
-    if (!isFullscreen) {
-      if (viewerRef.current.requestFullscreen) {
-        viewerRef.current.requestFullscreen()
-      }
-    } else {
-      if (document.exitFullscreen) {
-        document.exitFullscreen()
-      }
-    }
-  }
-
-  // Listen for fullscreen change
-  useEffect(() => {
-    const handleFullscreenChange = () => {
-      setIsFullscreen(!!document.fullscreenElement)
-    }
-
-    document.addEventListener("fullscreenchange", handleFullscreenChange)
-    return () => {
-      document.removeEventListener("fullscreenchange", handleFullscreenChange)
-    }
-  }, [])
-
-  // Handle audio toggle
-  const toggleAudio = () => {
-    if (!audioRef.current) return
-
-    if (isMuted) {
-      audioRef.current.volume = 0.5
-      audioRef.current.play()
-    } else {
-      audioRef.current.pause()
-    }
-
-    setIsMuted(!isMuted)
-  }
-
-  // Reset view
-  const resetView = () => {
-    if (panoViewerRef.current) {
-      panoViewerRef.current.animate({
-        zoom: 0,
-        latitude: 0,
-        longitude: 0,
-        speed: '2rpm',
-        easing: 'easeInOutCubic'
-      }).then(() => {
-        if (panoViewerRef.current) {
-          panoViewerRef.current.zoom(0);
-        }
-      });
-    }
-  };
-
-  // Call reset on initial load
-  useEffect(() => {
-    if (panoViewerRef.current && !isLoading) {
-      resetView();
-    }
-  }, [isLoading]);
-
-  // Zoom controls
-  const zoomIn = () => {
-    if (panoViewerRef.current) {
-      const currentZoom = panoViewerRef.current.getZoomLevel()
-      panoViewerRef.current.zoom(currentZoom + 20)
-    }
-  }
-
-  const zoomOut = () => {
-    if (panoViewerRef.current) {
-      const currentZoom = panoViewerRef.current.getZoomLevel()
-      panoViewerRef.current.zoom(currentZoom - 20)
-    }
-  }
-
-  // Auto-hide controls after inactivity
-  useEffect(() => {
-    let timeout: NodeJS.Timeout
-
-    const handleMovement = () => {
-      setShowControls(true)
-      clearTimeout(timeout)
-
-      timeout = setTimeout(() => {
-        setShowControls(false)
-      }, 3000)
-    }
-
-    window.addEventListener("mousemove", handleMovement)
-    window.addEventListener("touchstart", handleMovement)
-
-    // Initial timeout
-    timeout = setTimeout(() => {
-      setShowControls(false)
-    }, 3000)
-
-    return () => {
-      clearTimeout(timeout)
-      window.removeEventListener("mousemove", handleMovement)
-      window.removeEventListener("touchstart", handleMovement)
-    }
-  }, [])
-
   return (
-    <TooltipProvider>
-      <div
-        ref={viewerRef}
-        className={cn(
-          "relative overflow-hidden rounded-xl",
-          className
+    <>
+      <PanoramaPreloader
+        urls={[panoramaUrl, ...timeViews.map(view => view.imageUrl)]}
+        onProgress={setLoadingProgress}
+        onComplete={() => setIsLoading(false)}
+      />
+
+      <AnimatePresence>
+        {isLoading && (
+          <LoadingOverlay progress={loadingProgress} message="Loading panorama..." />
         )}
-        onMouseEnter={() => setShowControls(true)}
-        onMouseLeave={() => setShowControls(false)}
-      >
-        {/* Panorama Viewer */}
-        <div 
-          className="w-full h-full aspect-[2/1] bg-gray-900 [&_.psv-container]:!h-full [&_.psv-container]:!w-full [&_.psv-container]:!overflow-hidden"
-          style={{ 
-            minHeight: '400px',
-            position: 'relative'
-          }}
+      </AnimatePresence>
+
+      <div className={cn("relative w-full aspect-video bg-black", className)}>
+        <div ref={viewerRef} className="w-full h-full" />
+
+        {/* Controls */}
+        <motion.div
+          initial={false}
+          animate={{ opacity: showControls ? 1 : 0 }}
+          className="absolute bottom-0 left-0 right-0 p-4 flex items-center justify-between bg-gradient-to-t from-black/80 to-transparent pointer-events-none"
+        >
+          <div className="flex items-center gap-2 pointer-events-auto">
+            {/* Audio controls */}
+            {audioUrl && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-white hover:bg-white/20"
+                onClick={() => setIsMuted(!isMuted)}
+              >
+                {isMuted ? (
+                  <VolumeX className="w-5 h-5" />
+                ) : (
+                  <Volume2 className="w-5 h-5" />
+                )}
+              </Button>
+            )}
+
+            {/* Location info */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-white hover:bg-white/20"
+              onClick={() => setShowLocationInfo(!showLocationInfo)}
+            >
+              <Info className="w-5 h-5" />
+            </Button>
+
+            {/* AR toggle */}
+            {arPoints.length > 0 && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-white hover:bg-white/20"
+                onClick={() => setShowAR(!showAR)}
+              >
+                <Glasses className="w-5 h-5" />
+              </Button>
+            )}
+          </div>
+
+          <div className="flex items-center gap-2 pointer-events-auto">
+            {/* Reset view */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-white hover:bg-white/20"
+              onClick={() => {
+                if (panoViewerRef.current) {
+                  panoViewerRef.current.animate({
+                    longitude: 0,
+                    latitude: 0,
+                    zoom: 50,
+                    speed: '2rpm',
+                  })
+                }
+              }}
+            >
+              <RotateCcw className="w-5 h-5" />
+            </Button>
+
+            {/* Fullscreen toggle */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-white hover:bg-white/20"
+              onClick={() => setIsFullscreen(!isFullscreen)}
+            >
+              {isFullscreen ? (
+                <Minimize2 className="w-5 h-5" />
+              ) : (
+                <Maximize2 className="w-5 h-5" />
+              )}
+            </Button>
+          </div>
+        </motion.div>
+
+        {/* Location info panel */}
+        <AnimatePresence>
+          {showLocationInfo && (
+            <LocationInfoPanel
+              title={locationInfo.title}
+              description={locationInfo.description}
+              bestTimeToVisit={locationInfo.bestTimeToVisit}
+              weather={locationInfo.weather}
+              facts={locationInfo.facts}
+              nearbyPlaces={locationInfo.nearbyPlaces}
+              onClose={() => setShowLocationInfo(false)}
+            />
+          )}
+        </AnimatePresence>
+
+        {/* AR overlay */}
+        <AnimatePresence>
+          {showAR && (
+            <AROverlay
+              points={arPoints}
+              currentYaw={currentYaw}
+              currentPitch={currentPitch}
+              onToggle={() => setShowAR(!showAR)}
+            />
+          )}
+        </AnimatePresence>
+
+        {/* Time selector */}
+        {timeViews.length > 0 && (
+          <TimeSelector
+            views={timeViews}
+            currentView={currentTimeView}
+            onSelect={setCurrentTimeView}
+          />
+        )}
+
+        {/* Mini map */}
+        <PanoramaMiniMap
+          viewpoints={viewpoints}
+          currentYaw={currentYaw}
+          currentPitch={currentPitch}
+          onSelect={goToViewpoint}
         />
 
-        {/* Audio Element (if provided) */}
+        {/* Social features */}
+        <SocialFeatures panoramaId={panoramaId} />
+
+        {/* Audio */}
         {audioUrl && (
           <audio
             ref={audioRef}
@@ -365,188 +459,7 @@ export function VirtualTourViewer({
             className="hidden"
           />
         )}
-
-        {/* Loading Overlay */}
-        <AnimatePresence mode="sync">
-          {isLoading && (
-            <motion.div
-              key="loading-overlay"
-              initial={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm"
-            >
-              <div className="text-center">
-                <Loader2 className="h-8 w-8 animate-spin mx-auto mb-2" />
-                <p className="text-sm font-medium">Loading panorama...</p>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Social Features */}
-        <SocialFeatures
-          panoramaId={panoramaId}
-          title={title}
-          currentView={{ yaw: currentYaw, pitch: currentPitch }}
-        />
-
-        {/* AR Overlay */}
-        <AROverlay
-          points={arPoints}
-          currentYaw={currentYaw}
-          currentPitch={currentPitch}
-          isEnabled={showAR}
-          onToggle={() => setShowAR(!showAR)}
-        />
-
-        {/* Ambient Audio */}
-        <AmbientAudioSystem
-          tracks={ambientSounds}
-          isEnabled={!isMuted}
-          onToggle={() => setIsMuted(!isMuted)}
-        />
-
-        {/* Time Selector */}
-        <TimeSelector
-          views={timeViews}
-          currentView={currentTimeView}
-          onViewChange={handleTimeViewChange}
-        />
-
-        {/* Controls */}
-        <AnimatePresence mode="sync">
-          {showControls && (
-            <motion.div
-              key="controls-overlay"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2"
-            >
-              {audioUrl && (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="bg-black/50 backdrop-blur-sm hover:bg-black/70"
-                      onClick={toggleAudio}
-                    >
-                      {isMuted ? (
-                        <VolumeX className="h-4 w-4" />
-                      ) : (
-                        <Volume2 className="h-4 w-4" />
-                      )}
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>{isMuted ? "Unmute" : "Mute"} audio</p>
-                  </TooltipContent>
-                </Tooltip>
-              )}
-              
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="bg-black/50 backdrop-blur-sm hover:bg-black/70"
-                    onClick={zoomIn}
-                  >
-                    <ZoomIn className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Zoom in</p>
-                </TooltipContent>
-              </Tooltip>
-              
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="bg-black/50 backdrop-blur-sm hover:bg-black/70"
-                    onClick={zoomOut}
-                  >
-                    <ZoomOut className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Zoom out</p>
-                </TooltipContent>
-              </Tooltip>
-              
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="bg-black/50 backdrop-blur-sm hover:bg-black/70"
-                    onClick={resetView}
-                  >
-                    <RotateCcw className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Reset view</p>
-                </TooltipContent>
-              </Tooltip>
-              
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="bg-black/50 backdrop-blur-sm hover:bg-black/70"
-                    onClick={toggleFullscreen}
-                  >
-                    {isFullscreen ? (
-                      <Minimize2 className="h-4 w-4" />
-                    ) : (
-                      <Maximize2 className="h-4 w-4" />
-                    )}
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>{isFullscreen ? "Exit" : "Enter"} fullscreen</p>
-                </TooltipContent>
-              </Tooltip>
-              
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="bg-black/50 backdrop-blur-sm hover:bg-black/70"
-                    onClick={() => setShowLocationInfo(true)}
-                  >
-                    <MapPin className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Location Information</p>
-                </TooltipContent>
-              </Tooltip>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Mini Map */}
-        <PanoramaMiniMap
-          viewpoints={viewpoints}
-          currentYaw={currentYaw}
-          currentPitch={currentPitch}
-          onViewpointSelect={handleViewpointSelect}
-        />
-
-        {/* Location Info Panel */}
-        <LocationInfoPanel
-          info={locationInfo}
-          isOpen={showLocationInfo}
-          onClose={() => setShowLocationInfo(false)}
-        />
       </div>
-    </TooltipProvider>
+    </>
   )
 }

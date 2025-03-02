@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useMemo } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Layers, X, Info, Clock, Sun, Cloud, Temperature } from "lucide-react"
@@ -31,25 +31,23 @@ export function AROverlay({
   onToggle
 }: AROverlayProps) {
   const [selectedPoint, setSelectedPoint] = useState<ARPoint | null>(null)
-  const [visiblePoints, setVisiblePoints] = useState<ARPoint[]>([])
-
-  // Calculate which points are in the current field of view
-  useEffect(() => {
-    const yawRange = 60 // degrees
-    const pitchRange = 40 // degrees
-
-    const inRange = (value: number, target: number, range: number) => {
-      const diff = Math.abs(value - target)
-      return diff <= range || diff >= 360 - range
-    }
-
-    const visible = points.filter(point => 
-      inRange(point.yaw, currentYaw, yawRange) &&
-      inRange(point.pitch, currentPitch, pitchRange)
-    )
-
-    setVisiblePoints(visible)
-  }, [points, currentYaw, currentPitch])
+  const visiblePoints = useMemo(() => {
+    // Filter points that are within the current view (with some margin)
+    const viewRange = 40; // degrees
+    return points.filter(point => {
+      // Skip points with invalid coordinates
+      if (isNaN(point.yaw) || isNaN(point.pitch)) {
+        return false;
+      }
+      
+      // Calculate angular distance between current view and point
+      const yawDiff = Math.abs(((point.yaw - currentYaw + 180) % 360) - 180);
+      const pitchDiff = Math.abs(point.pitch - currentPitch);
+      
+      // Return true if point is within view range
+      return yawDiff < viewRange && pitchDiff < viewRange;
+    });
+  }, [points, currentYaw, currentPitch]);
 
   const getPointIcon = (type: string) => {
     switch (type) {

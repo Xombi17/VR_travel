@@ -3,17 +3,15 @@ import "./globals.css"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import Navigation from "@/components/navigation"
-import Footer from "@/components/footer"
-import { PageTransitionProvider } from "@/components/page-transition-provider"
-import { ScrollToTop } from "@/components/scroll-to-top"
 import { Toaster } from "sonner"
+import { AuthProvider } from "@/components/auth/auth-provider"
 
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Virtual Voyage - Experience the World in VR",
+  title: "Virtual Voyage - Experience the world from home",
   description:
-    "Explore the world's most breathtaking destinations from the comfort of your home with our cutting-edge VR technology.",
+    "Explore the world's most amazing destinations through immersive virtual reality experiences.",
 }
 
 export default function RootLayout({
@@ -24,13 +22,13 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth">
       <body className={`${inter.className} bg-black text-white`}>
-        <PageTransitionProvider>
-          <Navigation />
-          <main>{children}</main>
-          <Footer />
-          <ScrollToTop />
-          <Toaster position="bottom-right" theme="dark" />
-        </PageTransitionProvider>
+        <AuthProvider>
+          <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white">
+            <Navigation />
+            <main>{children}</main>
+            <Toaster position="top-right" richColors />
+          </div>
+        </AuthProvider>
       </body>
     </html>
   )

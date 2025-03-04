@@ -8,8 +8,48 @@ import { Button } from "@/components/ui/button"
 import { Info, Map } from "lucide-react"
 import Image from "next/image"
 
+// Define types
+interface ViewpointType {
+  id: string
+  name: string
+  description: string
+  yaw: number
+  pitch: number
+  zoom?: number
+}
+
+interface TimeViewType {
+  id: string
+  name: string
+  time: string
+  icon: 'sunrise' | 'noon' | 'sunset' | 'night'
+  panoramaUrl: string
+}
+
+interface ARPointType {
+  id: string
+  type: 'info' | 'link' | 'audio'
+  position: {
+    yaw: number
+    pitch: number
+  }
+  content: string
+  link?: string
+}
+
+interface DestinationVRData {
+  id: string
+  title: string
+  description: string
+  panoramaUrl: string
+  timeViews?: TimeViewType[]
+  viewpoints: ViewpointType[]
+  audioUrl?: string
+  arPoints?: ARPointType[]
+}
+
 // Define the panorama destinations with hotspots
-const panoramas = [
+const panoramas: DestinationVRData[] = [
   {
     id: "paris",
     title: "Paris, France",
@@ -135,28 +175,28 @@ const panoramas = [
         name: "Sunrise",
         time: "06:00",
         icon: "sunrise",
-        imageUrl: "/images/panoramas/paris-panorama.jpg"
+        panoramaUrl: "/images/panoramas/paris-panorama.jpg"
       },
       {
         id: "day",
         name: "Day",
         time: "12:00",
         icon: "noon",
-        imageUrl: "/images/panoramas/paris-panorama.jpg"
+        panoramaUrl: "/images/panoramas/paris-panorama.jpg"
       },
       {
         id: "sunset",
         name: "Sunset",
         time: "18:00",
         icon: "sunset",
-        imageUrl: "/images/panoramas/paris-panorama.jpg"
+        panoramaUrl: "/images/panoramas/paris-panorama.jpg"
       },
       {
         id: "night",
         name: "Night",
         time: "21:00",
         icon: "night",
-        imageUrl: "/images/panoramas/paris-panorama.jpg"
+        panoramaUrl: "/images/panoramas/paris-panorama.jpg"
       }
     ]
   },
@@ -293,28 +333,28 @@ const panoramas = [
         name: "Morning",
         time: "08:00",
         icon: "morning",
-        imageUrl: "/images/panoramas/santorini-panorama.jpg"
+        panoramaUrl: "/images/panoramas/santorini-panorama.jpg"
       },
       {
         id: "afternoon",
         name: "Afternoon",
         time: "14:00",
         icon: "afternoon",
-        imageUrl: "/images/panoramas/santorini-panorama.jpg"
+        panoramaUrl: "/images/panoramas/santorini-panorama.jpg"
       },
       {
         id: "sunset",
         name: "Sunset",
         time: "19:00",
         icon: "sunset",
-        imageUrl: "/images/panoramas/santorini-panorama.jpg"
+        panoramaUrl: "/images/panoramas/santorini-panorama.jpg"
       },
       {
         id: "night",
         name: "Night",
         time: "22:00",
         icon: "night",
-        imageUrl: "/images/panoramas/santorini-panorama.jpg"
+        panoramaUrl: "/images/panoramas/santorini-panorama.jpg"
       }
     ]
   },
@@ -442,28 +482,28 @@ const panoramas = [
         name: "Sunrise",
         time: "06:00",
         icon: "sunrise",
-        imageUrl: "/images/panoramas/grand-canyon-panorama.jpg"
+        panoramaUrl: "/images/panoramas/grand-canyon-panorama.jpg"
       },
       {
         id: "day",
         name: "Day",
         time: "12:00",
         icon: "noon",
-        imageUrl: "/images/panoramas/grand-canyon-panorama.jpg"
+        panoramaUrl: "/images/panoramas/grand-canyon-panorama.jpg"
       },
       {
         id: "sunset",
         name: "Sunset",
         time: "18:00",
         icon: "sunset",
-        imageUrl: "/images/panoramas/grand-canyon-panorama.jpg"
+        panoramaUrl: "/images/panoramas/grand-canyon-panorama.jpg"
       },
       {
         id: "night",
         name: "Night",
         time: "21:00",
         icon: "night",
-        imageUrl: "/images/panoramas/grand-canyon-panorama.jpg"
+        panoramaUrl: "/images/panoramas/grand-canyon-panorama.jpg"
       }
     ]
   },
@@ -591,28 +631,28 @@ const panoramas = [
         name: "Morning",
         time: "08:00",
         icon: "morning",
-        imageUrl: "/images/panoramas/kyoto-panorama.jpg"
+        panoramaUrl: "/images/panoramas/kyoto-panorama.jpg"
       },
       {
         id: "afternoon",
         name: "Afternoon",
         time: "14:00",
         icon: "afternoon",
-        imageUrl: "/images/panoramas/kyoto-panorama.jpg"
+        panoramaUrl: "/images/panoramas/kyoto-panorama.jpg"
       },
       {
         id: "sunset",
         name: "Sunset",
         time: "18:00",
         icon: "sunset",
-        imageUrl: "/images/panoramas/kyoto-panorama.jpg"
+        panoramaUrl: "/images/panoramas/kyoto-panorama.jpg"
       },
       {
         id: "night",
         name: "Night",
         time: "21:00",
         icon: "night",
-        imageUrl: "/images/panoramas/kyoto-panorama.jpg"
+        panoramaUrl: "/images/panoramas/kyoto-panorama.jpg"
       }
     ]
   },
@@ -740,28 +780,28 @@ const panoramas = [
         name: "Sunrise",
         time: "06:00",
         icon: "sunrise",
-        imageUrl: "/images/panoramas/taj-mahal-panorama.jpg"
+        panoramaUrl: "/images/panoramas/taj-mahal-panorama.jpg"
       },
       {
         id: "day",
         name: "Day",
         time: "12:00",
         icon: "noon",
-        imageUrl: "/images/panoramas/taj-mahal-panorama.jpg"
+        panoramaUrl: "/images/panoramas/taj-mahal-panorama.jpg"
       },
       {
         id: "sunset",
         name: "Sunset",
         time: "18:00",
         icon: "sunset",
-        imageUrl: "/images/panoramas/taj-mahal-panorama.jpg"
+        panoramaUrl: "/images/panoramas/taj-mahal-panorama.jpg"
       },
       {
         id: "night",
         name: "Night",
         time: "21:00",
         icon: "night",
-        imageUrl: "/images/panoramas/taj-mahal-panorama.jpg"
+        panoramaUrl: "/images/panoramas/taj-mahal-panorama.jpg"
       }
     ]
   }
@@ -860,16 +900,13 @@ export default function VRViewerPage() {
             {/* VR Viewer */}
             {selectedPanorama && (
               <VirtualTourViewer
-                panoramaId={selectedPanorama.id}
                 panoramaUrl={selectedPanorama.imageUrl}
                 title={selectedPanorama.title}
-                audioUrl={selectedPanorama.audioUrl}
-                hotspots={selectedPanorama.hotspots}
-                locationInfo={selectedPanorama.locationInfo}
+                description={selectedPanorama.description}
                 viewpoints={selectedPanorama.viewpoints}
-                arPoints={selectedPanorama.arPoints}
                 timeViews={selectedPanorama.timeViews}
-                ambientSounds={selectedPanorama.ambientSounds}
+                audioUrl={selectedPanorama.audioUrl}
+                arPoints={selectedPanorama.arPoints}
                 className="w-full"
               />
             )}

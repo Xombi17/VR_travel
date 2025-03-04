@@ -4,7 +4,9 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
-import { Search, Menu, X } from "lucide-react"
+import { Search, Menu, X, User, LogOut } from "lucide-react"
+import { useSession, signOut } from "next-auth/react"
+import Image from "next/image"
 
 const navItems = [
   { name: "Home", path: "/" },
@@ -14,13 +16,14 @@ const navItems = [
   { name: "Guide", path: "/guide" },
   { name: "About", path: "/about" },
   { name: "Help", path: "/help" },
-  { name: "Profile", path: "/profile" },
 ]
 
 export default function Navigation() {
   const [scrolled, setScrolled] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const pathname = usePathname()
+  const { data: session, status } = useSession()
+  const isAuthenticated = status === "authenticated"
 
   useEffect(() => {
     const handleScroll = () => {
@@ -83,13 +86,40 @@ export default function Navigation() {
             <span className="text-white/70 text-sm">Search</span>
           </motion.div>
 
-          <motion.button
-            className="bg-gradient-to-r from-teal-400 to-fuchsia-400 text-slate-900 px-5 py-2 rounded-full text-sm font-medium"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            Sign In
-          </motion.button>
+          {isAuthenticated ? (
+            <div className="flex items-center gap-3">
+              <Link href="/profile">
+                <motion.div
+                  className="flex items-center gap-2 glass-effect px-3 py-2 rounded-full"
+                  whileHover={{ scale: 1.05 }}
+                >
+                  {session.user?.image ? (
+                    <div className="relative h-6 w-6 overflow-hidden rounded-full">
+                      <Image 
+                        src={session.user.image} 
+                        alt={session.user.name || "User"} 
+                        fill 
+                        className="object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <User className="w-4 h-4 text-white/70" />
+                  )}
+                  <span className="text-white/70 text-sm">Profile</span>
+                </motion.div>
+              </Link>
+            </div>
+          ) : (
+            <Link href="/auth/signin">
+              <motion.button
+                className="bg-gradient-to-r from-teal-400 to-fuchsia-400 text-slate-900 px-5 py-2 rounded-full text-sm font-medium"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                Sign In
+              </motion.button>
+            </Link>
+          )}
         </div>
 
         {/* Mobile menu button */}
@@ -127,6 +157,25 @@ export default function Navigation() {
                     </Link>
                   </motion.div>
                 ))}
+                
+                {isAuthenticated && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: navItems.length * 0.1 }}
+                  >
+                    <Link
+                      href="/profile"
+                      className={`text-xl uppercase tracking-wider transition-colors ${
+                        pathname === "/profile" 
+                          ? "gradient-text font-medium" 
+                          : "text-white/70 hover:text-white"
+                      }`}
+                    >
+                      Profile
+                    </Link>
+                  </motion.div>
+                )}
               </nav>
 
               <motion.div
@@ -140,9 +189,27 @@ export default function Navigation() {
                   <span className="text-white/70 text-sm">Search</span>
                 </div>
 
-                <button className="bg-gradient-to-r from-teal-400 to-fuchsia-400 text-slate-900 py-3 rounded-full text-sm font-medium">
-                  Sign In
-                </button>
+                {isAuthenticated ? (
+                  <div className="flex flex-col gap-2">
+                    <Link href="/profile" className="flex items-center justify-center gap-2 glass-effect px-4 py-3 rounded-full">
+                      <User className="w-4 h-4 text-white/70" />
+                      <span className="text-white/70 text-sm">My Profile</span>
+                    </Link>
+                    <button 
+                      onClick={() => signOut({ callbackUrl: "/" })}
+                      className="flex items-center justify-center gap-2 glass-effect px-4 py-3 rounded-full text-red-400"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      <span className="text-sm">Sign Out</span>
+                    </button>
+                  </div>
+                ) : (
+                  <Link href="/auth/signin">
+                    <button className="w-full bg-gradient-to-r from-teal-400 to-fuchsia-400 text-slate-900 py-3 rounded-full text-sm font-medium">
+                      Sign In
+                    </button>
+                  </Link>
+                )}
               </motion.div>
             </motion.div>
           )}
@@ -151,4 +218,3 @@ export default function Navigation() {
     </motion.header>
   )
 }
-

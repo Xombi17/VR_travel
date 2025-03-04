@@ -36,8 +36,8 @@ export default function DestinationPage({ params }: { params: { id: string } }) 
   // Get the image for this destination or use a default
   const imagePath = destinationImages[params.id] || "/images/destinations/default.jpg"
 
-  // Check if this destination has a VR experience
-  const hasVRExperience = ["paris", "taj-mahal", "grand-canyon", "kyoto", "santorini"].includes(params.id)
+  // Check if this destination has a VR experience using the property from the destination data
+  const hasVRExperience = destination.hasVRExperience || false
 
   return (
     <>
@@ -53,7 +53,28 @@ export default function DestinationPage({ params }: { params: { id: string } }) 
         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-transparent" />
         
         <div className="container mx-auto h-full flex flex-col justify-end pb-12">
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-2">{destination.title}</h1>
+          <div className="flex items-center gap-3 mb-2">
+            <h1 className="text-4xl md:text-5xl font-bold text-white">{destination.title}</h1>
+            {hasVRExperience && (
+              <div className="flex items-center gap-1 px-3 py-1 bg-gradient-to-r from-teal-400 to-fuchsia-400 rounded-full shadow-lg">
+                <svg 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  width="16" 
+                  height="16" 
+                  viewBox="0 0 24 24" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  strokeWidth="2" 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                  className="text-white"
+                >
+                  <path d="M3 12h.01M21 12h.01M9 12h.01M15 12h.01M21 8v8a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1ZM7 12h10"/>
+                </svg>
+                <span className="text-xs font-bold text-white">VR Ready</span>
+              </div>
+            )}
+          </div>
           <div className="flex items-center text-white/90 mb-4">
             <div className="flex items-center">
               <Star className="w-5 h-5 fill-yellow-500 text-yellow-500 mr-1" />
@@ -98,6 +119,97 @@ export default function DestinationPage({ params }: { params: { id: string } }) 
                 Experience the magic of {destination.title} in virtual reality. Walk through the charming streets, visit iconic landmarks, and immerse yourself in the rich culture and history of {destination.title.split(',')[0]}. Our VR experience brings the beauty and atmosphere directly to you.
               </p>
               
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                <div className="bg-gray-800 rounded-lg p-4 text-center">
+                  <div className="text-2xl font-bold text-white mb-1">4.5+</div>
+                  <div className="text-sm text-white/60">Hours</div>
+                </div>
+                <div className="bg-gray-800 rounded-lg p-4 text-center">
+                  <div className="text-2xl font-bold text-white mb-1">10+</div>
+                  <div className="text-sm text-white/60">Locations</div>
+                </div>
+                <div className="bg-gray-800 rounded-lg p-4 text-center">
+                  <div className="text-2xl font-bold text-white mb-1">15+</div>
+                  <div className="text-sm text-white/60">Activities</div>
+                </div>
+                <div className="bg-gray-800 rounded-lg p-4 text-center">
+                  <div className="text-2xl font-bold text-white mb-1">24/7</div>
+                  <div className="text-sm text-white/60">Support</div>
+                </div>
+              </div>
+
+              {hasVRExperience && (
+                <div className="bg-gradient-to-r from-teal-500/20 to-fuchsia-500/20 border border-teal-500/50 rounded-xl p-6 mb-8">
+                  <h3 className="text-xl font-bold text-white mb-2">Virtual Reality Experience Available</h3>
+                  <p className="text-white/80 mb-4">
+                    Immerse yourself in a 360° virtual tour of {destination.title}. Explore iconic landmarks and experience the destination from the comfort of your home.
+                  </p>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">
+                    <div className="md:col-span-2">
+                      <div className="relative h-48 md:h-full w-full rounded-lg overflow-hidden">
+                        <Image
+                          src={`/images/panoramas/${destination.id}-panorama.jpg`}
+                          alt={`${destination.title} VR Experience`}
+                          fill
+                          className="object-cover"
+                          onError={(e: any) => {
+                            e.currentTarget.src = "/images/panoramas/default-panorama.jpg";
+                            e.currentTarget.onerror = null;
+                          }}
+                        />
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center cursor-pointer hover:bg-white/30 transition-all">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white">
+                              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                            </svg>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-4">
+                      <div className="bg-black/30 backdrop-blur-sm rounded-lg p-4">
+                        <h4 className="font-medium text-white mb-1">Immersive Experience</h4>
+                        <p className="text-sm text-white/70">360° panoramic views with interactive hotspots and audio narration</p>
+                      </div>
+                      
+                      <div className="bg-black/30 backdrop-blur-sm rounded-lg p-4">
+                        <h4 className="font-medium text-white mb-1">VR Compatible</h4>
+                        <p className="text-sm text-white/70">Works with VR headsets or directly in your browser</p>
+                      </div>
+                      
+                      <div className="bg-black/30 backdrop-blur-sm rounded-lg p-4">
+                        <h4 className="font-medium text-white mb-1">Free Access</h4>
+                        <p className="text-sm text-white/70">No additional cost for our virtual reality experiences</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <Link href={`/vr-viewer/${destination.id}`}>
+                    <Button className="w-full md:w-auto bg-gradient-to-r from-teal-400 to-fuchsia-400 hover:from-teal-500 hover:to-fuchsia-500 text-white">
+                      <svg 
+                        xmlns="http://www.w3.org/2000/svg" 
+                        width="16" 
+                        height="16" 
+                        viewBox="0 0 24 24" 
+                        fill="none" 
+                        stroke="currentColor" 
+                        strokeWidth="2" 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round" 
+                        className="mr-2"
+                      >
+                        <path d="M3 12h.01M21 12h.01M9 12h.01M15 12h.01M21 8v8a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1ZM7 12h10"/>
+                      </svg>
+                      Start VR Experience
+                    </Button>
+                  </Link>
+                </div>
+              )}
+
+              <h3 className="text-xl font-bold text-white mb-4">What You'll Experience</h3>
+
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
                 {/* Map attractions based on destination */}
                 {(() => {
@@ -214,7 +326,7 @@ export default function DestinationPage({ params }: { params: { id: string } }) 
               </div>
 
               {hasVRExperience ? (
-                <Link href={`/vr-viewer?destination=${params.id}`}>
+                <Link href={`/vr-viewer/${destination.id}`}>
                   <Button 
                     className="w-full bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600" 
                     size="lg"
@@ -237,4 +349,3 @@ export default function DestinationPage({ params }: { params: { id: string } }) 
     </>
   )
 }
-

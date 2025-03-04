@@ -7,6 +7,7 @@ export interface Destination {
   rating: number
   reviewCount: number
   category: string
+  region?: string
   featured?: boolean
   imagePath: string
   hasVRExperience?: boolean
@@ -22,8 +23,10 @@ export const destinations: Destination[] = [
     rating: 4.8,
     reviewCount: 423,
     category: "Europe",
+    region: "Western Europe",
     featured: true,
-    imagePath: "/images/destinations/eiffel-tower.jpg"
+    imagePath: "/images/destinations/eiffel-tower.jpg",
+    hasVRExperience: true
   },
   {
     id: "great-wall",
@@ -34,6 +37,7 @@ export const destinations: Destination[] = [
     rating: 4.9,
     reviewCount: 387,
     category: "Asia",
+    region: "East Asia",
     featured: true,
     imagePath: "/images/destinations/great-wall.jpg"
   },
@@ -46,7 +50,9 @@ export const destinations: Destination[] = [
     rating: 4.7,
     reviewCount: 315,
     category: "Asia",
-    imagePath: "/images/destinations/taj-mahal.jpg"
+    region: "South Asia",
+    imagePath: "/images/destinations/taj-mahal.jpg",
+    hasVRExperience: true
   },
   {
     id: "machu-picchu",
@@ -57,6 +63,7 @@ export const destinations: Destination[] = [
     rating: 4.9,
     reviewCount: 276,
     category: "South America",
+    region: "Andes",
     featured: true,
     imagePath: "/images/destinations/machu-picchu.jpg"
   },
@@ -69,6 +76,7 @@ export const destinations: Destination[] = [
     rating: 4.6,
     reviewCount: 289,
     category: "Africa",
+    region: "North Africa",
     imagePath: "/images/destinations/pyramids.jpg"
   },
   {
@@ -80,7 +88,9 @@ export const destinations: Destination[] = [
     rating: 4.8,
     reviewCount: 352,
     category: "North America",
-    imagePath: "/images/destinations/grand-canyon.jpg"
+    region: "Southwest USA",
+    imagePath: "/images/destinations/grand-canyon.jpg",
+    hasVRExperience: true
   },
   {
     id: "santorini",
@@ -91,8 +101,10 @@ export const destinations: Destination[] = [
     rating: 4.9,
     reviewCount: 412,
     category: "Europe",
+    region: "Mediterranean",
     featured: true,
-    imagePath: "/images/destinations/santorini.jpg"
+    imagePath: "/images/destinations/santorini.jpg",
+    hasVRExperience: true
   },
   {
     id: "kyoto",
@@ -103,7 +115,9 @@ export const destinations: Destination[] = [
     rating: 4.8,
     reviewCount: 298,
     category: "Asia",
-    imagePath: "/images/destinations/kyoto.jpg"
+    region: "East Asia",
+    imagePath: "/images/destinations/kyoto.jpg",
+    hasVRExperience: true
   },
   {
     id: "venice",
@@ -114,6 +128,7 @@ export const destinations: Destination[] = [
     rating: 4.7,
     reviewCount: 356,
     category: "Europe",
+    region: "Mediterranean",
     imagePath: "/images/destinations/venice.jpg"
   },
   {
@@ -125,6 +140,7 @@ export const destinations: Destination[] = [
     rating: 4.9,
     reviewCount: 278,
     category: "Oceania",
+    region: "South Pacific",
     featured: true,
     imagePath: "/images/destinations/bora-bora.jpg"
   },
@@ -137,6 +153,7 @@ export const destinations: Destination[] = [
     rating: 4.8,
     reviewCount: 245,
     category: "Middle East",
+    region: "Middle East",
     imagePath: "/images/destinations/petra.jpg"
   },
   {
@@ -148,6 +165,7 @@ export const destinations: Destination[] = [
     rating: 4.7,
     reviewCount: 312,
     category: "Asia",
+    region: "Southeast Asia",
     imagePath: "/images/destinations/angkor-wat.jpg"
   },
   {
@@ -159,6 +177,7 @@ export const destinations: Destination[] = [
     rating: 4.9,
     reviewCount: 198,
     category: "Africa",
+    region: "East Africa",
     imagePath: "/images/destinations/serengeti.jpg"
   },
   {
@@ -170,6 +189,7 @@ export const destinations: Destination[] = [
     rating: 4.6,
     reviewCount: 287,
     category: "South America",
+    region: "Atlantic Coast",
     imagePath: "/images/destinations/rio.jpg"
   },
   {
@@ -181,6 +201,7 @@ export const destinations: Destination[] = [
     rating: 4.9,
     reviewCount: 234,
     category: "Europe",
+    region: "Nordic",
     featured: true,
     imagePath: "/images/destinations/northern-lights.jpg"
   },
@@ -193,6 +214,7 @@ export const destinations: Destination[] = [
     rating: 4.7,
     reviewCount: 321,
     category: "Oceania",
+    region: "Australia",
     imagePath: "/images/destinations/sydney.jpg"
   }
 ] 

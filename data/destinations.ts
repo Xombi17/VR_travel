@@ -9,6 +9,7 @@ export interface Destination {
   category: string
   featured?: boolean
   imagePath: string
+  hasVRExperience?: boolean
 }
 
 export const destinations: Destination[] = [

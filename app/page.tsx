@@ -1,19 +1,16 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useRef } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { DestinationCard } from "@/components/destination-card"
 import { destinations } from "@/data/destinations"
-import { Search, ChevronDown } from "lucide-react"
-import { motion, useScroll, useTransform, useInView, useAnimation, AnimatePresence } from "framer-motion"
-import { SearchBar } from "@/components/search-bar"
+import { motion, useScroll, useTransform, useAnimation } from "framer-motion"
 import { OptimizedImage } from "@/components/optimized-image"
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
 
-function getDestinationImage(id) {
-  const destinationImages = {
+function getDestinationImage(id: string) {
+  const destinationImages: Record<string, string> = {
     paris: "/images/destinations/eiffel-tower.jpg",
     "great-wall": "/images/destinations/great-wall.jpg",
     "taj-mahal": "/images/destinations/taj-mahal.jpg",

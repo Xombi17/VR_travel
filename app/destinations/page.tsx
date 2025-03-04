@@ -7,14 +7,11 @@ import { DestinationCard } from "@/components/destination-card"
 import { destinations } from "@/data/destinations"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Search } from "lucide-react"
 import { LoadingAnimation } from "@/components/loading-animation"
-
-const ParallaxCard = motion.div;
 
 export default function DestinationsPage() {
   // Group destinations by category
-  const destinationsByCategory = destinations.reduce((acc, destination) => {
+  const destinationsByCategory = destinations.reduce((acc: Record<string, typeof destinations>, destination: typeof destinations[0]) => {
     const { category } = destination
     if (!acc[category]) {
       acc[category] = []
@@ -29,14 +26,12 @@ export default function DestinationsPage() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState("")
   const [filteredDestinations, setFilteredDestinations] = useState(destinations)
-  const [isLoaded, setIsLoaded] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     // Simulate loading
     const timer = setTimeout(() => {
       setIsLoading(false)
-      setIsLoaded(true)
     }, 1000)
     
     return () => clearTimeout(timer)
@@ -126,7 +121,6 @@ export default function DestinationsPage() {
                 transition={{ duration: 0.5, delay: 0.4 }}
               >
                 <div className="flex items-center">
-                  <Search className="w-5 h-5 text-white/50 mr-2" />
                   <Input
                     type="text"
                     placeholder="Search destinations..."
@@ -219,6 +213,7 @@ export default function DestinationsPage() {
                         rating={destination.rating}
                         reviewCount={destination.reviewCount}
                         hasVRExperience={destination.hasVRExperience}
+                        price={destination.price}
                       />
                     </motion.div>
                   ))}

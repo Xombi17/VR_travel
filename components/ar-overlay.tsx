@@ -3,7 +3,7 @@
 import { useEffect, useState, useMemo } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "@/components/ui/button"
-import { Layers, X, Info, Clock, Sun, Cloud, Temperature } from "lucide-react"
+import { Layers, X, Info, Clock, Sun, Cloud } from "lucide-react"
 
 interface ARPoint {
   id: string

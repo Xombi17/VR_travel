@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import { motion } from "framer-motion"
-import Image from "next/image"
 import Link from "next/link"
 import { ChevronDown, ChevronUp, Search } from "lucide-react"
 import { Button } from "@/components/ui/button"

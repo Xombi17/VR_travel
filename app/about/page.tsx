@@ -309,7 +309,7 @@ export default function AboutPage() {
             viewport={{ once: true, amount: 0.2 }}
             variants={containerVariants}
           >
-            {teamMembers.map((member, index) => (
+            {teamMembers.map((member) => (
               <motion.div
                 key={member.name}
                 className="glass-card rounded-xl border border-white/10 backdrop-blur-sm overflow-hidden hover:scale-105 transition-transform duration-300"

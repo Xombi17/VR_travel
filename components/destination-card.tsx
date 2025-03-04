@@ -12,6 +12,7 @@ export interface DestinationCardProps {
   rating?: number
   reviewCount?: number
   hasVRExperience?: boolean
+  price: number
 }
 
 export function DestinationCard({

@@ -5,6 +5,8 @@ import { motion } from "framer-motion"
 import { Expand, Minimize, RotateCcw, Headset } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
+declare module 'pannellum';
+
 interface PanoramaViewerProps {
   imageUrl: string
   title?: string

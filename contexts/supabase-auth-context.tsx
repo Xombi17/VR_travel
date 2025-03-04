@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { Session, User } from "@supabase/supabase-js";
 import { useRouter } from "next/navigation";
+import { toast } from "react-hot-toast";
 
 type SupabaseAuthContextType = {
   user: User | null;
@@ -109,23 +110,12 @@ export function SupabaseAuthProvider({
   };
 
   const signUp = async (email: string, password: string) => {
-    try {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-      });
-      
-      return {
-        error,
-        success: !error,
-      };
-    } catch (error) {
-      console.error("Unexpected error during sign up:", error);
-      return {
-        error: error as Error,
-        success: false,
-      };
+    const { error } = await supabase.auth.signUp({ email, password });
+    if (error) {
+      return { error, success: false };
     }
+    toast.success('Sign-up successful!');
+    return { error: null, success: true };
   };
 
   const signOut = async () => {

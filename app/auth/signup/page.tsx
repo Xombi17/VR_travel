@@ -7,6 +7,7 @@ import Link from "next/link";
 import { toast } from "sonner";
 import { z } from "zod";
 import { registerSchema } from "@/lib/validations/auth";
+import { useSupabaseAuth } from '@/contexts/supabase-auth-context';
 
 type FormErrors = {
   name?: string[];
@@ -18,6 +19,7 @@ type FormErrors = {
 
 export default function SignUp() {
   const router = useRouter();
+  const { user } = useSupabaseAuth();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -37,7 +39,9 @@ export default function SignUp() {
           if (!formattedErrors[path]) {
             formattedErrors[path] = [];
           }
-          formattedErrors[path]?.push(err.message);
+          if (Array.isArray(formattedErrors[path])) {
+            formattedErrors[path].push(err.message);
+          }
         });
         setErrors(formattedErrors);
       }

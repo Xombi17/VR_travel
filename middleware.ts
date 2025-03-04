@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getToken } from "next-auth/jwt";
 import { createMiddlewareClient } from "@supabase/auth-helpers-nextjs";
 
 export async function middleware(req: NextRequest) {
@@ -11,14 +10,8 @@ export async function middleware(req: NextRequest) {
   // Check Supabase session
   const { data: { session: supabaseSession } } = await supabase.auth.getSession();
   
-  // Check NextAuth session
-  const nextAuthSession = await getToken({ 
-    req, 
-    secret: process.env.NEXTAUTH_SECRET 
-  });
-  
-  // User is authenticated if they have either a NextAuth or Supabase session
-  const isAuthenticated = !!nextAuthSession || !!supabaseSession;
+  // User is authenticated if they have a Supabase session
+  const isAuthenticated = !!supabaseSession;
   const pathname = req.nextUrl.pathname;
 
   // Define protected routes

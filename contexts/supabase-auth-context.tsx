@@ -1,11 +1,11 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
-import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
+import { Session, User } from "@supabase/supabase-js";
 import { useRouter } from "next/navigation";
 
-type SupabaseContextType = {
+type SupabaseAuthContextType = {
   user: User | null;
   session: Session | null;
   isLoading: boolean;
@@ -25,21 +25,11 @@ type SupabaseContextType = {
   }>;
 };
 
-const SupabaseContext = createContext<SupabaseContextType>({
-  user: null,
-  session: null,
-  isLoading: true,
-  signIn: async () => ({ error: null, success: false }),
-  signUp: async () => ({ error: null, success: false }),
-  signOut: async () => {},
-  signInWithGoogle: async () => {},
-  resetPassword: async () => ({ error: null, success: false }),
-});
+const SupabaseAuthContext = createContext<SupabaseAuthContextType | undefined>(
+  undefined
+);
 
-export const useSupabase = () => useContext(SupabaseContext);
-export const useSupabaseAuth = () => useContext(SupabaseContext);
-
-export default function SupabaseProvider({
+export function SupabaseAuthProvider({
   children,
 }: {
   children: React.ReactNode;
@@ -50,38 +40,49 @@ export default function SupabaseProvider({
   const router = useRouter();
 
   useEffect(() => {
-    // Get the current session
-    const getSession = async () => {
-      const { data, error } = await supabase.auth.getSession();
-      if (error) {
-        console.error("Error getting session:", error);
-      } else {
-        setSession(data.session);
-        setUser(data.session?.user || null);
+    // Get initial session
+    const getInitialSession = async () => {
+      setIsLoading(true);
+      try {
+        const { data, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error("Error getting session:", error);
+        }
+        
+        if (data && data.session) {
+          setSession(data.session);
+          setUser(data.session.user);
+        }
+      } catch (error) {
+        console.error("Unexpected error during session retrieval:", error);
+      } finally {
+        setIsLoading(false);
       }
-      setIsLoading(false);
     };
 
-    getSession();
+    getInitialSession();
 
-    // Listen for auth state changes
+    // Set up auth state change listener
     const { data: authListener } = supabase.auth.onAuthStateChange(
-      async (event, newSession) => {
-        console.log("Supabase auth event:", event);
-        setSession(newSession);
-        setUser(newSession?.user || null);
+      async (event, session) => {
+        setSession(session);
+        setUser(session?.user ?? null);
         setIsLoading(false);
         
         if (event === "SIGNED_IN") {
+          // Force a router refresh when user signs in
           router.refresh();
         }
         
         if (event === "SIGNED_OUT") {
+          // Force a router refresh when user signs out
           router.refresh();
         }
       }
     );
 
+    // Clean up subscription on unmount
     return () => {
       authListener.subscription.unsubscribe();
     };
@@ -172,8 +173,18 @@ export default function SupabaseProvider({
   };
 
   return (
-    <SupabaseContext.Provider value={value}>
+    <SupabaseAuthContext.Provider value={value}>
       {children}
-    </SupabaseContext.Provider>
+    </SupabaseAuthContext.Provider>
   );
+}
+
+export function useSupabaseAuth() {
+  const context = useContext(SupabaseAuthContext);
+  
+  if (context === undefined) {
+    throw new Error("useSupabaseAuth must be used within a SupabaseAuthProvider");
+  }
+  
+  return context;
 }

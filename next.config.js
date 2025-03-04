@@ -1,17 +1,21 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Configure for static export
-  output: 'export',
-  // Disable image optimization for static export
+  // Dynamic server rendering instead of static export
+  // output: 'export',
+  
+  // Enable image optimization for dynamic rendering
   images: {
-    unoptimized: true,
+    domains: ['lh3.googleusercontent.com'], // Allow Google profile images
   },
-  // Disable server components for static export
+  
+  // Enable server components
   experimental: {
     esmExternals: true,
   },
-  // Ensure trailing slashes for static export
-  trailingSlash: true,
+  
+  // Disable trailing slashes for dynamic rendering
+  // trailingSlash: true,
+  
   // Disable TypeScript checking during build
   typescript: {
     // !! WARN !!

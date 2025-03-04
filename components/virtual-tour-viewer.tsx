@@ -101,7 +101,7 @@ interface MarkerData extends Marker {
 }
 
 type ViewerConfig = {
-  container: HTMLDivElement;
+  element: HTMLDivElement;
   panorama: string;
   defaultZoomLvl: number;
   minFov: number;
@@ -114,15 +114,15 @@ type ViewerConfig = {
   navbar: boolean;
   defaultYaw: number;
   fisheye: boolean;
-  loadingImg: string;
-  loadingTxt: string;
-  plugins: any[];
-  sphereCorrection: {
+  loadingImg?: string;
+  loadingTxt?: string;
+  plugins?: any[];
+  sphereCorrection?: {
     pan: number;
     tilt: number;
     roll: number;
   };
-  panoData: {
+  panoData?: {
     fullWidth: number;
     fullHeight: number;
     croppedWidth: number;
@@ -186,7 +186,7 @@ export function VirtualTourViewer({
 
     // Create the viewer with smooth movement
     const viewer = new Viewer({
-      container: viewerRef.current,
+      element: viewerRef.current,
       panorama: panoramaUrl,
       defaultZoomLvl: 0,
       minFov: 30,

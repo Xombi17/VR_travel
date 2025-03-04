@@ -5,4 +5,9 @@ declare module '@photo-sphere-viewer/core' {
       timingFunction: string;
     };
   }
+
+  export class Viewer {
+    constructor(config: ViewerConfig);
+    // Add any other methods or properties as needed
+  }
 } 

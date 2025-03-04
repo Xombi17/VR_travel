@@ -136,6 +136,12 @@ type ViewerConfig = {
   };
 };
 
+interface AbstractPlugin<T> {
+  clearMarkers?: () => void;
+  addMarker?: (marker: MarkerData) => void;
+  // ... other properties ...
+}
+
 export function VirtualTourViewer({
   panoramaId,
   panoramaUrl,

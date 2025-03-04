@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "generate-placeholders": "node scripts/generate-image-placeholders.js"
+    "generate-placeholders": "node scripts/generate-image-placeholders.js",
+    "export": "next build && next export"
   },
   "dependencies": {
     "@egjs/react-view360": "^3.0.4",

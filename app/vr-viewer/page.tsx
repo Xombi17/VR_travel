@@ -768,8 +768,9 @@ const panoramas = [
 ]
 
 export default function VRViewerPage() {
-  const searchParams = useSearchParams()
-  const destinationParam = searchParams.get('destination')
+  // Create a fallback for useSearchParams during static export
+  const searchParams = typeof window !== 'undefined' ? useSearchParams() : { get: () => null };
+  const destinationParam = searchParams.get ? searchParams.get('destination') : null;
   
   const [selectedPanorama, setSelectedPanorama] = useState(panoramas[0])
   const [showInfo, setShowInfo] = useState(false)

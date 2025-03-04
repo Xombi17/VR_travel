@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { registerSchema } from "@/lib/validations/auth";
 import { useSupabaseAuth } from '@/contexts/supabase-auth-context';
+import { Session } from "@supabase/supabase-js";
 
 type FormErrors = {
   name?: string[];
@@ -15,6 +16,12 @@ type FormErrors = {
   password?: string[];
   confirmPassword?: string[];
   form?: string;
+};
+
+type SignInResponse = {
+  error?: string;
+  success?: boolean;
+  session?: Session;
 };
 
 export default function SignUp() {
@@ -26,6 +33,7 @@ export default function SignUp() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
+  const [isSignedUp, setIsSignedUp] = useState(false);
 
   const validateForm = () => {
     try {
@@ -80,7 +88,17 @@ export default function SignUp() {
         if (response.status === 409) {
           setErrors({ email: ["User with this email already exists"] });
         } else if (data.details) {
-          setErrors(data.details);
+          const formattedErrors: FormErrors = {};
+          data.details.forEach((err: any) => {
+            const path = err.path[0] as keyof FormErrors;
+            if (!formattedErrors[path]) {
+              formattedErrors[path] = [];
+            }
+            if (typeof err.message === 'string') {
+              formattedErrors[path].push(err.message);
+            }
+          });
+          setErrors(formattedErrors);
         } else {
           setErrors({ form: [data.error || "Registration failed"] });
         }
@@ -89,7 +107,7 @@ export default function SignUp() {
       }
 
       // Sign in the user after successful registration
-      const result = await signIn("credentials", {
+      const result: SignInResponse = await signIn("credentials", {
         redirect: false,
         email,
         password,
@@ -101,10 +119,11 @@ export default function SignUp() {
         return;
       }
 
-      // Show success toast
-      toast.success("Account created successfully!", {
-        description: "Welcome to Virtual Voyage!",
-      });
+      if (result?.success) {
+        setIsSignedUp(true);
+        localStorage.setItem('userSession', JSON.stringify(result.session));
+        toast.success('Signup successful!');
+      }
 
       // Redirect to home page
       router.push("/");

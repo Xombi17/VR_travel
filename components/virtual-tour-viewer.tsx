@@ -100,6 +100,42 @@ interface MarkerData extends Marker {
   };
 }
 
+type ViewerConfig = {
+  container: HTMLDivElement;
+  panorama: string;
+  defaultZoomLvl: number;
+  minFov: number;
+  maxFov: number;
+  moveInertia: boolean;
+  mousewheel: boolean;
+  mousemove: boolean;
+  moveSpeed: number;
+  zoomSpeed: number;
+  navbar: boolean;
+  defaultYaw: number;
+  fisheye: boolean;
+  loadingImg: string;
+  loadingTxt: string;
+  plugins: any[];
+  sphereCorrection: {
+    pan: number;
+    tilt: number;
+    roll: number;
+  };
+  panoData: {
+    fullWidth: number;
+    fullHeight: number;
+    croppedWidth: number;
+    croppedHeight: number;
+    croppedX: number;
+    croppedY: number;
+  };
+  transition?: {
+    duration: number;
+    timingFunction: string;
+  };
+};
+
 export function VirtualTourViewer({
   panoramaId,
   panoramaUrl,
@@ -154,14 +190,8 @@ export function VirtualTourViewer({
       mousemove: true,
       moveSpeed: 1.5,
       zoomSpeed: 1,
-      transition: {
-        duration: 1500,
-        loader: true,
-        blur: true,
-      },
       navbar: false,
-      defaultLat: 0,
-      defaultLong: 0,
+      defaultYaw: 0,
       fisheye: true,
       loadingImg: 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7',
       loadingTxt: 'Loading...',
@@ -180,6 +210,10 @@ export function VirtualTourViewer({
         croppedHeight: 4096,
         croppedX: 0,
         croppedY: 0
+      },
+      transition: {
+        duration: 1000,
+        timingFunction: 'ease-out'
       }
     })
 
